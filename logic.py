@@ -5,7 +5,10 @@ import os.path
 
 
 class Logic(QMainWindow, Ui_MainWindow):
-    def __init__(self):
+    def __init__(self) -> None:
+        """
+        method that sets up most of the button connections
+        """
         super().__init__()
         self.setupUi(self)
 
@@ -26,38 +29,57 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.button_modify.clicked.connect((lambda: self.modify()))
         self.button_delete.clicked.connect(lambda: self.delete())
 
-    def shrink_screen(self):
+    def shrink_screen(self) -> None:
+        """
+        method that minimizes the screen
+        """
         try:
             self.setMinimumSize(QtCore.QSize(810, 470))
             self.setMaximumSize(QtCore.QSize(810, 470))
         except Exception as e:
             print(f"{e}")
 
-    def expand_screen(self):
+    def expand_screen(self) -> None:
+        """
+        method that makes the screen larger to fit more information
+        """
         self.setMaximumSize(QtCore.QSize(810, 810))
         self.setMinimumSize(QtCore.QSize(810, 810))
         self.hide_time()
 
-    def hide_time(self):
+    def hide_time(self) -> None:
+        """
+        method that keeps the start/end time labels and options hidden
+        """
         self.label_start.hide()
         self.label_end.hide()
         self.timeEdit_start.hide()
         self.timeEdit_end.hide()
 
-    def show_time(self):
+    def show_time(self) -> None:
+        """
+        method that allows for the start/end time labels and options to reappear
+        """
         self.label_start.show()
         self.label_end.show()
         self.timeEdit_end.show()
         self.timeEdit_start.show()
 
-    def change_date(self):
+    def change_date(self) -> tuple:
+        """
+        method that gets the selected month, day, and year
+        """
         month = self.calendar.selectedDate().month()
         year = self.calendar.selectedDate().year()
         day = self.calendar.selectedDate().day()
 
         return month, day, year
 
-    def get_month(self, month):
+    def get_month(self, month) -> str:
+        """
+        converts a numerical value into months
+        :param month: takes in a numerical value which represents a month
+        """
         month = str(month)
         if month == '1' or month == '01':
             return 'January'
@@ -84,15 +106,24 @@ class Logic(QMainWindow, Ui_MainWindow):
         elif month == '12':
             return 'December'
 
-    def numeric_date(self):
+    def numeric_date(self) -> int:
+        """
+        method that return the year, month, and day in hyphened integer form
+        """
         return self.calendar.selectedDate().toPyDate()
 
-    def change_date_label(self):
+    def change_date_label(self) -> None:
+        """
+        method that changes the date to be displayed
+        """
         month, day, year = self.change_date()
         month = self.get_month(month)
         self.label_date.setText(f'{month} {day}, {year}')
 
-    def confirm(self):
+    def confirm(self) -> None:
+        """
+        method for the confirm button which valids the information to be recorded such as the name, date, location, start/end time of the event
+        """
         try:
             title = self.input_title.text().strip()
             location = self.input_location.text()
@@ -128,13 +159,19 @@ class Logic(QMainWindow, Ui_MainWindow):
             self.shrink_screen()
             self.create_date(self.numeric_date(), title, location, start_time, end_time)
 
-    def all_day(self):
+    def all_day(self) -> None:
+        """
+        method that allows for the time options to show up when no is pressed on the radio buttons
+        """
         if self.radioButton_yes.isChecked():
             self.hide_time()
         elif self.radioButton_no.isChecked():
             self.show_time()
 
-    def clear(self):
+    def clear(self) -> None:
+        """
+        method that hides/shows widgets as needed
+        """
         try:
             self.input_title.clear()
             self.input_location.clear()
@@ -164,7 +201,10 @@ class Logic(QMainWindow, Ui_MainWindow):
 
         Logic.file_name = ''
 
-    def toggle_event(self):
+    def toggle_event(self) -> None:
+        """
+        method that hides and shows widgets
+        """
         self.expand_screen()
         self.button_confirm.hide()
         self.button_modify.show()
@@ -177,8 +217,15 @@ class Logic(QMainWindow, Ui_MainWindow):
         self.label_start.show()
         self.label_end.show()
 
-
-    def create_date(self, numeric_date, title, location, start_time, end_time):
+    def create_date(self, numeric_date, title, location, start_time, end_time) -> None:
+        """
+        method that takes in calendar information to write it to csv files and display it on a list
+        :param numeric_date: the selected date on the calendar but in numeric form
+        :param title: the title of the event
+        :param location: the location of the event
+        :param start_time: the time the event will begin
+        :param end_time: the time the event will end
+        """
         try:
             flag = 0
             file_name = str(numeric_date) + '_' + title.replace(' ', '_')
@@ -193,7 +240,7 @@ class Logic(QMainWindow, Ui_MainWindow):
             for index in range(self.list_events.count()):
                 item = self.list_events.item(index)
                 print(item.text())
-                if item.text() == (testing_file):
+                if item.text() == testing_file:
                     flag = 1
 
             if flag == 0:
@@ -204,7 +251,12 @@ class Logic(QMainWindow, Ui_MainWindow):
         except Exception as e:
             print(f'{e}')
 
-    def view_item(self, item):
+    def view_item(self, item) -> None:
+        """
+        method that displays the details of the event when it is accessed through the list
+        :param item: a recorded event
+        :return:
+        """
         try:
             file_name = item.text().split()
             file_name = '_'.join(file_name) + '.csv'
@@ -225,7 +277,10 @@ class Logic(QMainWindow, Ui_MainWindow):
         except Exception as e:
             print(f'{e}')
 
-    def modify(self):
+    def modify(self) -> None:
+        """
+        method that makes changes to events that have already been recorded
+        """
         try:
             safety_file = Logic.file_name
             print(f"top logic: {Logic.file_name}")
@@ -249,7 +304,10 @@ class Logic(QMainWindow, Ui_MainWindow):
         except Exception as e:
             print(f'{e}')
 
-    def delete(self):
+    def delete(self) -> None:
+        """
+        method that deletes an event
+        """
         try:
             if os.path.exists(Logic.file_name):
                 os.remove(Logic.file_name)
